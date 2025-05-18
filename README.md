@@ -1,50 +1,35 @@
-# Welcome to your Expo app 👋
+# Aplicación de Tareas y Notificaciones
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Esta aplicación, desarrollada en React Native con Expo, está diseñada para ayudar a los usuarios a gestionar sus tareas y notificaciones de manera eficiente. A continuación se describen las funcionalidades principales y los requisitos del sistema.
 
-## Get started
+## Funcionalidades Principales
 
-1. Install dependencies
+1. **Inicio de Sesión con Notion**: Los usuarios pueden iniciar sesión utilizando su cuenta de Notion para acceder a sus tareas y eventos.
 
-   ```bash
-   npm install
-   ```
+2. **Gestión de Tareas del Campus**: La aplicación extrae automáticamente las tareas del campus virtual en un rango de +/- 2 meses de la fecha actual. Los usuarios pueden ver, modificar y marcar estas tareas como completadas.
 
-2. Start the app
+3. **Tareas Personales**: Los usuarios pueden crear, modificar y eliminar tareas personales. También pueden filtrar las tareas para ver solo las del campus, solo las personales o ambas.
 
-   ```bash
-   npx expo start
-   ```
+4. **Vista de Ideas**: Los usuarios pueden crear, modificar y eliminar ideas personales, cada una con un título, un cuerpo de texto y un tag.
 
-In the output, you'll find options to open the app in a
+5. **Notificaciones**: Los usuarios recibirán notificaciones cada vez que se añadan o modifiquen tareas automáticas del campus.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+6. **Sincronización Automática**: La aplicación sincroniza las tareas del campus con Notion cada 10 minutos para mantener la información actualizada.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+7. **Widgets**: Se ofrecen widgets para que los usuarios puedan ver las tareas próximas o las ideas creadas de manera rápida y accesible.
 
-## Get a fresh project
+## Requisitos del Sistema
 
-When you're ready, run:
+- **Campus Virtual**: El sistema debe poder extraer tareas del campus virtual y validar que las bases de datos de Notion tengan las propiedades adecuadas.
+- **Eventos de Notion**: Permitir la extracción de tareas mediante filtros y la modificación de tareas existentes.
+- **Manejo de Usuarios**: Los usuarios deben iniciar sesión con Notion para acceder a la vista de tareas.
+- **Ajustes Personalizados**: Los usuarios pueden modificar propiedades visibles y nombres relacionados con las bases de datos.
+
+## Instalación
+
+Para instalar la aplicación, clone el repositorio y ejecute:
 
 ```bash
-npm run reset-project
+npm install
+npm start
 ```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
