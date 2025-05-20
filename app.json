@@ -1,11 +1,12 @@
 {
   "expo": {
-    "name": "prueba-native",
-    "slug": "prueba-native",
+    "name": "cvnotion",
+    "slug": "cvnotion",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "pruebanative",
+    "scheme": "cvnotion",
+    "deepLinking": true,
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -17,7 +18,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.pruebanative"
+      "package": "com.migueldm.cvnotion"
     },
     "web": {
       "bundler": "metro",
