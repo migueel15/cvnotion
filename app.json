@@ -33,7 +33,7 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#000000"
         }
       ],
       [
@@ -46,7 +46,12 @@
       [
         "expo-font",
         {
-          "fonts": ["./assets/fonts/Tagesschrift-Regular.ttf"]
+          "fonts": [
+            "./assets/fonts/Tagesschrift-Regular.ttf",
+            "./assets/fonts/sf-pro-display/sf-pro-display-regular.otf",
+            "./assets/fonts/sf-pro-display/sf-pro-display-italic.otf",
+            "./assets/fonts/sf-pro-display/sf-pro-display-bold.otf"
+          ]
         }
       ]
     ],
