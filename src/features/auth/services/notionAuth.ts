@@ -1,5 +1,7 @@
 import base64 from "react-native-base64";
 import { setSecureItem } from "@/store/secureStorageHandler";
+import { User } from "@/types/types";
+import { setItem, storeUserData } from "@/store/asyncStorageHandler";
 
 const CLIENT_ID = process.env.EXPO_PUBLIC_OAUTH_ID!;
 const CLIENT_SECRET = process.env.EXPO_PUBLIC_OAUTH_SECRET!;
@@ -13,7 +15,7 @@ const encodedAuthorization = () => {
 };
 
 export const getTokenFromCode = async (code: string) => {
-  if (!code) return;
+  if (!code) return null
 
   const encodedCredentials = encodedAuthorization();
 
@@ -36,8 +38,22 @@ export const getTokenFromCode = async (code: string) => {
 
   if (!response.ok) {
     console.error("Error converting code to token (notion):", dataJson);
-    return;
+    return null
   }
+
+  const userData = dataJson.owner.user;
+
+  const user: User = {
+    id: userData.id,
+    name: userData.name,
+    email: userData.email,
+    image: userData.avatar_url,
+  }
+  console.log(user)
+
+  setItem("user", user.id);
+  storeUserData(userData.id, user);
+
 
   return dataJson.access_token;
 };

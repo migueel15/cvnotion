@@ -1,3 +1,4 @@
+import { User } from "@/types/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const setItem = async (key: string, value: any): Promise<void> => {
@@ -29,3 +30,17 @@ export const removeItem = async (key: string): Promise<void> => {
     console.error("Error al eliminar de AsyncStorage:", e);
   }
 };
+
+export const storeUserData = async (id: User["id"],json: Partial<User>): Promise<void> => {
+  try {
+    const currentUserData = await AsyncStorage.getItem(id);
+    if (!currentUserData) {
+      await AsyncStorage.setItem(id, JSON.stringify(json));
+    } else {
+      await AsyncStorage.mergeItem(id, JSON.stringify(json));
+    }
+  } catch (e) {
+    console.error("Error al actualizar el usuario en AsyncStorage:", e);
+  }
+};
+  

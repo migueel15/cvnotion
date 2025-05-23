@@ -1,4 +1,5 @@
 import { getSecureItem } from "@/store/secureStorageHandler";
+import { User } from "@/types/types";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { createContext, PropsWithChildren, useContext, useState } from "react";
@@ -7,6 +8,8 @@ type AuthState = {
   isReady: boolean;
   isLoggedIn: boolean;
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 };
 
 export const AuthContext = createContext<AuthState | undefined>(undefined);
@@ -14,6 +17,7 @@ export const AuthContext = createContext<AuthState | undefined>(undefined);
 export function AuthProvider({ children }: PropsWithChildren) {
   const [isReady, setIsReady] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -34,7 +38,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, isReady }}>
+    <AuthContext.Provider
+      value={{ isLoggedIn, setIsLoggedIn, isReady, user, setUser }}
+    >
       {children}
     </AuthContext.Provider>
   );
