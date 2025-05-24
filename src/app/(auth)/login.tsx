@@ -4,8 +4,6 @@ import { useEffect } from "react";
 import { Redirect } from "expo-router";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { SafeAreaView } from "react-native-safe-area-context";
-import NotionLogo from "@/features/auth/components/NotionLogo";
-import * as Linking from "expo-linking";
 import NotionLogoSvg from "@/assets/svg/notion-logo.svg";
 import CVNotionLogo from "@/features/auth/components/CVNotionLogo";
 

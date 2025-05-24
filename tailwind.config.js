@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 import { platformSelect } from "nativewind/theme";
+import colors from "./src/colors"
 module.exports = {
   content: [
     "./src/components/**/*.{js,jsx,ts,tsx}",
@@ -8,13 +9,7 @@ module.exports = {
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
-      colors: {
-        primary: "#4d89eb",
-        dark: "#1a1a1a",
-        "light-dark": "#262626",
-        gray: "#303030",
-        white: "#ffffff",
-      },
+      colors,
       fontFamily: {
         sans: ["sf-pro-display-regular", "sans"],
         bold: ["sf-pro-display-bold", "sans"],

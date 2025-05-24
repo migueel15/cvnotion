@@ -32,16 +32,28 @@ export type NotionEvent = {
 /*
  * Nombres de las columnas en la base de datos
  */
+
+export type NotionProperty =
+  | "title"
+  | "rich_text"
+  | "select"
+  | "status"
+  | "date"
+  | "last_edited_time";
+
 export type NotionColumns = {
-  title: {columnName:string, type:"title"}
-  description: {columnName:string, type:"rich_text"}
-  cvId: {columnName:string, type:"rich_text"}
-  subject: {columnName:string, type:"select"}
-  status: {columnName:string, type:"status"}
-  type: {columnName:string, type:"select"}
-  start_date: {columnName:string, type:"date"}
-  end_date: {columnName:string, type:"date"}
-  last_modified: {columnName:string, type:"last_edited_time"}
+  [K in Exclude<
+    keyof NotionEvent,
+    "id" | "databaseId" | "start_date" | "end_date"
+  >]: {
+    columnName: string;
+    type: NotionProperty;
+  };
+} & {
+  date: {
+    columnName: string;
+    type: NotionProperty;
+  };
 };
 
 /**

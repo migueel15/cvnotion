@@ -1,7 +1,8 @@
-import { getSecureItem } from "@/store/secureStorageHandler";
+import { getSecureItem } from "@/application/services/SecureStorageService";
 import { User } from "@/types/types";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
+import * as AuthService from "@/application/services/AuthService";
 import { createContext, PropsWithChildren, useContext, useState } from "react";
 
 type AuthState = {
@@ -21,11 +22,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   useEffect(() => {
     const checkLoginStatus = async () => {
-      // Check if the user is logged in
       try {
-        const token = await getSecureItem("notion_token");
-        if (token) {
+        const isValid = await AuthService.tryRestoreSession();
+        if (isValid) {
           setIsLoggedIn(true);
+          const user = await AuthService.getUser();
+          setUser(user);
         }
       } catch (error) {
         console.error("Error checking login status:", error);

@@ -3,7 +3,7 @@ import base64 from "react-native-base64";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { getTokenFromCode } from "@/features/auth/services/notionAuth";
-import { getSecureItem } from "@/store/secureStorageHandler";
+import { getSecureItem } from "@/application/services/SecureStorageService";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 
 export default function Callback() {
@@ -11,8 +11,8 @@ export default function Callback() {
   const auth = useAuth();
 
   useEffect(() => {
-    const { code } = route.params || {};
-    auth.retrieveTokenFromCodeAndStore(code);
+    const { code } = route.params as { code: string };
+    auth.login(code);
   }, [route.params]);
 
   return null;
