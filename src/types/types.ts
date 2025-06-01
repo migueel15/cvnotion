@@ -33,27 +33,44 @@ export type NotionEvent = {
  * Nombres de las columnas en la base de datos
  */
 
-export type NotionProperty =
+export type NotionType =
   | "title"
   | "rich_text"
   | "select"
   | "status"
   | "date"
-  | "last_edited_time";
+  | "last_edited_time"
+  | "multi_select"
+  | "people"
+  | "email"
+  | "url"
+  | "phone_number"
+  | "number"
+  | "checkbox"
+  | "created_time"
+  | "created_by"
+  | "created_by_user"
+  | "relation";
 
-export type NotionColumns = {
+export type NotionProperty = {
+  id: string;
+  columnName: string;
+  type: NotionType;
+  options?: {
+    id: string;
+    name: string;
+    color: string | null;
+    description: string | null;
+  }[];
+};
+
+export type DatabaseColumns = {
   [K in Exclude<
     keyof NotionEvent,
     "id" | "databaseId" | "start_date" | "end_date"
-  >]: {
-    columnName: string;
-    type: NotionProperty;
-  };
+  >]: NotionProperty;
 } & {
-  date: {
-    columnName: string;
-    type: NotionProperty;
-  };
+  date: NotionProperty;
 };
 
 /**
@@ -64,7 +81,7 @@ export type NotionDatabase = {
   name: string;
   icon?: string;
   calendar_url?: string;
-  columns: NotionColumns;
+  columns: DatabaseColumns | null;
 };
 
 export type User = {

@@ -31,7 +31,10 @@ export const removeItem = async (key: string): Promise<void> => {
   }
 };
 
-export const storeUserData = async (id: User["id"],json: Partial<User>): Promise<void> => {
+export const storeUserData = async (
+  id: User["id"],
+  json: Partial<User>,
+): Promise<void> => {
   try {
     const currentUserData = await AsyncStorage.getItem(id);
     if (!currentUserData) {
@@ -43,4 +46,3 @@ export const storeUserData = async (id: User["id"],json: Partial<User>): Promise
     console.error("Error al actualizar el usuario en AsyncStorage:", e);
   }
 };
-  

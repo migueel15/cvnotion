@@ -1,13 +1,14 @@
 import {
-  NotionColumns,
-  NotionDatabase,
+  DatabaseColumns,
+  type NotionDatabase,
   NotionEvent,
-  UUID,
+  NotionProperty,
+  type UUID,
 } from "@/types/types";
 
 import {
   Client,
-  DatabaseObjectResponse,
+  type DatabaseObjectResponse,
   isFullDatabase,
 } from "@notionhq/client";
 
@@ -16,10 +17,8 @@ interface NotionServiceInterface {
   isInitialized(): boolean;
   reset(): void;
   getDatabase(databaseId: string): Promise<DatabaseObjectResponse | null>;
-  // getDatabases(): Promise<NotionDatabase[]>;
-  getDatabaseProperties(
-    databaseId: UUID
-  ): Promise<DatabaseObjectResponse["properties"] | null>;
+  getDatabases(): Promise<NotionDatabase[]>;
+  getDatabaseProperties(databaseId: UUID): Promise<NotionProperty[] | null>;
   // addDatabaseProperty(
   //   databaseId: UUID,
   //   property: Partial<NotionColumns>
@@ -51,16 +50,16 @@ function reset(): void {
 function checkClient() {
   if (!client) {
     throw new Error(
-      "Notion client is not initialized. Call initialize() first."
+      "Notion client is not initialized. Call initialize() first.",
     );
   }
 }
 
 async function getDatabase(
-  databaseId: string
+  databaseId: string,
 ): Promise<DatabaseObjectResponse | null> {
   checkClient();
-  const database = await client!.databases.retrieve({
+  const database = await client?.databases.retrieve({
     database_id: databaseId,
   });
   if (isFullDatabase(database)) {
@@ -69,15 +68,60 @@ async function getDatabase(
   return null;
 }
 
-async function getDatabaseProperties(
-  databaseId: string
-): Promise<DatabaseObjectResponse["properties"] | null> {
+async function getDatabases(): Promise<NotionDatabase[]> {
   checkClient();
-  const database = await client!.databases.retrieve({
+  const databases = await client?.search({
+    filter: {
+      property: "object",
+      value: "database",
+    },
+  });
+  if (!databases) return [];
+
+  const databasesList = databases.results
+    .filter(isFullDatabase)
+    .map((database): NotionDatabase => {
+      try {
+        return {
+          id: database.id as UUID,
+          name: database.title[0].plain_text,
+          icon:
+            database.icon?.type === "emoji" ? database.icon.emoji : undefined,
+          calendar_url: undefined,
+          columns: null,
+        };
+      } catch (error) {
+        return {} as NotionDatabase;
+      }
+    });
+
+  return databasesList;
+}
+
+async function getDatabaseProperties(
+  databaseId: string,
+): Promise<NotionProperty[] | null> {
+  checkClient();
+  const database = await client?.databases.retrieve({
     database_id: databaseId,
   });
+  if (!database) return null;
+
   if (isFullDatabase(database)) {
-    return database.properties;
+    const properties: NotionProperty[] = [];
+    for (const [key, value] of Object.entries(database.properties)) {
+      let options: NotionProperty["options"] = [];
+      if (value.type === "status") {
+        options = value.status?.options || [];
+      }
+      properties.push({
+        id: value.id,
+        columnName: key,
+        type: value.type as NotionProperty["type"],
+        options: options,
+      });
+    }
+    return properties;
   }
   return null;
 }
@@ -87,6 +131,7 @@ const NotionService: NotionServiceInterface = {
   isInitialized,
   reset,
   getDatabase,
+  getDatabases,
   getDatabaseProperties,
 };
 

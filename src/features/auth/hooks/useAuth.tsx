@@ -6,16 +6,7 @@ import {
   setSecureItem,
 } from "@/application/services/SecureStorageService";
 import { useRouter } from "expo-router";
-import {
-  getTokenFromCode,
-  revokeToken,
-  validateToken,
-} from "../services/notionAuth";
-import {
-  getItem,
-  removeItem,
-} from "@/application/services/AsyncStorageService";
-import { User } from "@/types/types";
+import type { User } from "@/types/types";
 import * as AuthService from "@/application/services/AuthService";
 
 export const useAuth = () => {
