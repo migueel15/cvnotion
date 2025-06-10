@@ -14,6 +14,7 @@ export default function Layout() {
   }
 
   if (auth.user?.databases === undefined) {
+    console.log("redireccionando");
     return <Redirect href={"/(config)/newDatabase"} />;
   }
 

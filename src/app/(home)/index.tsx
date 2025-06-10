@@ -3,6 +3,7 @@ import colors from "@/colors";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import type { NotionDatabase } from "@/types/types";
 import { Button } from "@expo/ui/jetpack-compose";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect } from "react";
 import { useState } from "react";
 import { Image, Text, View } from "react-native";
@@ -17,14 +18,14 @@ export default function Home() {
   useEffect(() => {
     const getDatabases = async () => {
       setLoading(true);
-      const databases = await notion.getDatabases();
+      const databases = await auth.user?.databases;
+      if (!databases) return;
       setDatabases(databases);
       setLoading(false);
 
       const props = await notion.getDatabaseProperties(databases[0]?.id ?? "");
       setProps(props);
     };
-    getDatabases();
     getDatabases();
   }, []);
 
@@ -50,7 +51,17 @@ export default function Home() {
       >
         LOG OUT
       </Button>
-
+      <Button
+        elementColors={{
+          containerColor: colors.dark,
+          contentColor: colors.primary,
+        }}
+        onPress={() => {
+          AsyncStorage.clear();
+        }}
+      >
+        BORRAR BASE DE DATOS
+      </Button>
       <Text>
         {databases
           .map((database) => `${database.icon ?? ""} ${database.name}`)

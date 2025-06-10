@@ -33,11 +33,21 @@ export const useAuth = () => {
     router.replace("/login");
   };
 
+  const updateUserContext = async () => {
+    const user = await AuthService.getUser();
+    console.log("aaaa");
+    if (!user) return;
+    console.log("USER", user);
+    context.setUser(user);
+    context.setIsLoggedIn(true);
+  };
+
   return {
     isLoggedIn,
     isReady,
     user,
     login,
     logout,
+    updateUserContext,
   };
 };

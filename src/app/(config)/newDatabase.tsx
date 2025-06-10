@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import { FlatList, Linking, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Dropdown from "@/features/shared/components/DropDown";
 import { Button } from "@expo/ui/jetpack-compose";
@@ -20,10 +21,15 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
+import * as Clipboard from "expo-clipboard";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { storeUserData } from "@/application/services/AsyncStorageService";
 
 type FormSection = "database" | "properties" | "campus";
 
 export default function NewDatabase() {
+  const router = useRouter();
+  const auth = useAuth();
   const [section, setSection] = useState<FormSection>("database");
 
   const sectionLabel = {
@@ -36,12 +42,27 @@ export default function NewDatabase() {
   const [currentDatabase, setCurrentDatabase] = useState<NotionDatabase | null>(
     null
   );
+  const [attributes, setAttributes] = useState<DatabaseColumns | null>(null);
   const [properties, setProperties] = useState<NotionProperty[]>([]);
   const [campusCalendarUrl, setCampusCalendarUrl] = useState("");
 
+  const fetchCopiedText = async () => {
+    const text = await Clipboard.getStringAsync();
+    const defaultFilter = "preset_what=all&preset_time=recentupcoming";
+    const formatedString = text.substring(text.indexOf("https://"));
+    const url = formatedString.substring(
+      0,
+      formatedString.indexOf("&preset_what")
+    );
+    const campusCalendarUrl = `${url}&${defaultFilter}`;
+    console.log(campusCalendarUrl);
+    setCampusCalendarUrl(campusCalendarUrl);
+    return campusCalendarUrl;
+  };
+
   const notion = NotionService;
 
-  const databaseColumns: DatabaseColumns = {
+  let databaseColumns: DatabaseColumns = {
     title: {
       id: "",
       columnName: "",
@@ -174,8 +195,14 @@ export default function NewDatabase() {
                     data={getPropertiesWithType(
                       databaseColumns[key as keyof DatabaseColumns].type
                     )}
-                    onChange={(value) => {}}
-                    placeholder="elegir"
+                    onChange={(option) => {
+                      databaseColumns[key as keyof DatabaseColumns].columnName =
+                        option.label;
+                      databaseColumns[key as keyof DatabaseColumns].id =
+                        option.value;
+                      console.log(databaseColumns);
+                    }}
+                    placeholder=" "
                   />
                 </View>
               </View>
@@ -183,7 +210,47 @@ export default function NewDatabase() {
           </View>
         )}
 
-        {section === "campus" && <Text>campus</Text>}
+        {section === "campus" && (
+          <View className="flex-1 w-full justify-center items-center">
+            <Text className="text-center text-white text-xl">
+              Accede al{" "}
+              <Text
+                className="text-primary cursor-pointer"
+                onPress={() => {
+                  Linking.openURL(
+                    "https://informatica.cv.uma.es/calendar/export.php"
+                  );
+                }}
+              >
+                campus
+              </Text>
+            </Text>
+            <Text className="text-center text-white text-xl">
+              Inicia sesión con tu cuenta
+            </Text>
+            <Text className="text-center text-white text-xl">
+              Accede al calendario
+            </Text>
+            <Text className="text-center text-white text-xl">
+              Selecciona el filtro que quieras compartir
+            </Text>
+            <Text className="text-center text-white text-xl">Obten URL</Text>
+            <Button
+              style={{
+                marginTop: "auto",
+                marginBottom: 20,
+                width: "80%",
+              }}
+              onPress={fetchCopiedText}
+              elementColors={{
+                containerColor: colors.gray,
+                contentColor: colors.white,
+              }}
+            >
+              Obtener URL
+            </Button>
+          </View>
+        )}
       </View>
 
       <Button
@@ -192,19 +259,45 @@ export default function NewDatabase() {
           marginBottom: 20,
           width: "80%",
         }}
-        onPress={() => {
-          if (section === "database" && !currentDatabase) {
+        onPress={async () => {
+          if (section === "database" && currentDatabase) {
+            setSection("properties");
             return;
           }
 
-          setSection((prev) => (prev === "database" ? "properties" : "campus"));
+          if (
+            section === "properties" &&
+            Object.values(databaseColumns).every((column) => column.id !== "")
+          ) {
+            setAttributes(databaseColumns);
+            setSection((prev) =>
+              prev === "database" ? "properties" : "campus"
+            );
+          }
+
+          if (section === "campus") {
+            await fetchCopiedText();
+
+            // create user new data and redirect to home
+            if (currentDatabase && attributes) {
+              currentDatabase.columns = attributes;
+              currentDatabase.calendar_url = campusCalendarUrl;
+              if (!auth.user) return;
+              const payload = {
+                databases: [currentDatabase],
+              };
+              console.log(payload);
+              await storeUserData(auth.user.id, payload);
+              router.replace("/(home)");
+            }
+          }
         }}
         elementColors={{
           containerColor: colors.gray,
           contentColor: colors.white,
         }}
       >
-        Continuar
+        {section === "campus" ? "Pegar y continuar" : "Continuar"}
       </Button>
     </SafeAreaView>
   );
