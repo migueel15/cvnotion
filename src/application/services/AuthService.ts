@@ -142,8 +142,11 @@ export const logout = async () => {
 };
 
 export const getUser = async (): Promise<User | null> => {
+  console.log("GETTING USER");
   const userId = await AsyncStorage.getItem<string>("user");
+  console.log("USER ID", userId);
   if (!userId) return null;
   const user = await AsyncStorage.getItem<User>(userId);
+  console.log("USER", user);
   return user;
 };

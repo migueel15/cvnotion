@@ -1,6 +1,5 @@
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { Redirect, Tabs } from "expo-router";
-import * as AuthService from "@/application/services/AuthService";
 
 export default function Layout() {
   const auth = useAuth();
@@ -14,7 +13,6 @@ export default function Layout() {
   }
 
   if (auth.user?.databases === undefined) {
-    console.log("redireccionando");
     return <Redirect href={"/(config)/newDatabase"} />;
   }
 

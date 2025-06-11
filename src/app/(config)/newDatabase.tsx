@@ -5,22 +5,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Dropdown from "@/features/shared/components/DropDown";
 import { Button } from "@expo/ui/jetpack-compose";
 import colors from "@/colors";
-import {
-  DatabaseColumns,
-  NotionDatabase,
-  NotionProperty,
-  UUID,
-} from "@/types/types";
+import { DatabaseColumns, NotionDatabase, NotionProperty } from "@/types/types";
 import NotionService from "@/application/services/NotionService";
-import Animated, {
-  SlideInRight,
-  SlideOutLeft,
-  SlideInLeft,
-  SlideOutRight,
-  LinearTransition,
-  useSharedValue,
-  withSpring,
-} from "react-native-reanimated";
 import * as Clipboard from "expo-clipboard";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { storeUserData } from "@/application/services/AsyncStorageService";
@@ -276,10 +262,15 @@ export default function NewDatabase() {
           }
 
           if (section === "campus") {
+            auth.setIsReady(false);
             await fetchCopiedText();
+            console.log("cambioo");
+            console.log(currentDatabase);
+            console.log("ATRI", attributes);
 
             // create user new data and redirect to home
             if (currentDatabase && attributes) {
+              console.log("USER", auth);
               currentDatabase.columns = attributes;
               currentDatabase.calendar_url = campusCalendarUrl;
               if (!auth.user) return;
@@ -288,9 +279,13 @@ export default function NewDatabase() {
               };
               console.log(payload);
               await storeUserData(auth.user.id, payload);
-              router.replace("/(home)");
+              await auth.updateUserContext();
+              auth.setIsReady(true);
+              router.replace("/");
             }
           }
+
+          console.log("aaaaa");
         }}
         elementColors={{
           containerColor: colors.gray,
@@ -298,6 +293,13 @@ export default function NewDatabase() {
         }}
       >
         {section === "campus" ? "Pegar y continuar" : "Continuar"}
+      </Button>
+      <Button
+        onPress={() => {
+          router.navigate("/(auth)/login");
+        }}
+      >
+        Replace
       </Button>
     </SafeAreaView>
   );

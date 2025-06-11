@@ -9,6 +9,7 @@ type AuthState = {
   isReady: boolean;
   isLoggedIn: boolean;
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsReady: React.Dispatch<React.SetStateAction<boolean>>;
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
 };
@@ -25,9 +26,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
       try {
         const isValid = await AuthService.tryRestoreSession();
         if (isValid) {
-          setIsLoggedIn(true);
+          console.log("USER IS LOGGED IN");
           const user = await AuthService.getUser();
+          console.log(user);
           setUser(user);
+          if (user) {
+            setIsLoggedIn(true);
+          }
+          console.log("USER STATE CONTEXT SETTED", user);
         }
       } catch (error) {
         console.error("Error checking login status:", error);
@@ -41,7 +47,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn, setIsLoggedIn, isReady, user, setUser }}
+      value={{ isLoggedIn, setIsLoggedIn, isReady, setIsReady, user, setUser }}
     >
       {children}
     </AuthContext.Provider>

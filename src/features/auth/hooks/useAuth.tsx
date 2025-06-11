@@ -1,18 +1,10 @@
-import { notionClient } from "@/features/notion/client";
 import { useAuthContext } from "@/context/authContext";
-import {
-  getSecureItem,
-  removeSecureItem,
-  setSecureItem,
-} from "@/application/services/SecureStorageService";
 import { useRouter } from "expo-router";
-import type { User } from "@/types/types";
 import * as AuthService from "@/application/services/AuthService";
 
 export const useAuth = () => {
   const context = useAuthContext();
   const router = useRouter();
-
   const isLoggedIn = context.isLoggedIn;
   const isReady = context.isReady;
   const user = context.user;
@@ -35,9 +27,7 @@ export const useAuth = () => {
 
   const updateUserContext = async () => {
     const user = await AuthService.getUser();
-    console.log("aaaa");
     if (!user) return;
-    console.log("USER", user);
     context.setUser(user);
     context.setIsLoggedIn(true);
   };
@@ -45,6 +35,7 @@ export const useAuth = () => {
   return {
     isLoggedIn,
     isReady,
+    setIsReady: context.setIsReady,
     user,
     login,
     logout,

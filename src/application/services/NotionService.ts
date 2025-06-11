@@ -50,18 +50,19 @@ function reset(): void {
 function checkClient() {
   if (!client) {
     throw new Error(
-      "Notion client is not initialized. Call initialize() first.",
+      "Notion client is not initialized. Call initialize() first."
     );
   }
 }
 
 async function getDatabase(
-  databaseId: string,
+  databaseId: string
 ): Promise<DatabaseObjectResponse | null> {
   checkClient();
   const database = await client?.databases.retrieve({
     database_id: databaseId,
   });
+  if (!database) return null;
   if (isFullDatabase(database)) {
     return database;
   }
@@ -99,7 +100,7 @@ async function getDatabases(): Promise<NotionDatabase[]> {
 }
 
 async function getDatabaseProperties(
-  databaseId: string,
+  databaseId: string
 ): Promise<NotionProperty[] | null> {
   checkClient();
   const database = await client?.databases.retrieve({
