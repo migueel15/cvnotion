@@ -2,7 +2,7 @@ import * as WebBrowser from "expo-web-browser";
 import { Text, TouchableOpacity, View } from "react-native";
 import { useEffect } from "react";
 import { Redirect } from "expo-router";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/useAuth";
 import { SafeAreaView } from "react-native-safe-area-context";
 import NotionLogoSvg from "@/assets/svg/notion-logo.svg";
 import CVNotionLogo from "@/features/auth/components/CVNotionLogo";

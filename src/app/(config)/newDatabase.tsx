@@ -5,18 +5,29 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Dropdown from "@/features/shared/components/DropDown";
 import { Button } from "@expo/ui/jetpack-compose";
 import colors from "@/colors";
-import { DatabaseColumns, NotionDatabase, NotionProperty } from "@/types/types";
-import NotionService from "@/application/services/NotionService";
+import { DatabaseColumns } from "@/types/types";
 import * as Clipboard from "expo-clipboard";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/useAuth";
 import { storeUserData } from "@/application/services/AsyncStorageService";
+import useDatabaseConfigurator from "@/features/config/useDatabaseConfigurator";
 
 type FormSection = "database" | "properties" | "campus";
 
 export default function NewDatabase() {
   const router = useRouter();
+  const {
+    section,
+    databases,
+    currentDatabase,
+    properties,
+    attributes,
+    initializeDatabaseConfigProcces,
+    setDatabaseProperties,
+    selectDatabase,
+    changeSection,
+    changeAttributes,
+  } = useDatabaseConfigurator();
   const auth = useAuth();
-  const [section, setSection] = useState<FormSection>("database");
 
   const sectionLabel = {
     database: "Vincula una base de datos",
@@ -24,12 +35,6 @@ export default function NewDatabase() {
     campus: "Vincula tu calendario del campus virtual",
   };
 
-  const [databases, setDatabases] = useState<NotionDatabase[]>([]);
-  const [currentDatabase, setCurrentDatabase] = useState<NotionDatabase | null>(
-    null
-  );
-  const [attributes, setAttributes] = useState<DatabaseColumns | null>(null);
-  const [properties, setProperties] = useState<NotionProperty[]>([]);
   const [campusCalendarUrl, setCampusCalendarUrl] = useState("");
 
   const fetchCopiedText = async () => {
@@ -38,17 +43,14 @@ export default function NewDatabase() {
     const formatedString = text.substring(text.indexOf("https://"));
     const url = formatedString.substring(
       0,
-      formatedString.indexOf("&preset_what")
+      formatedString.indexOf("&preset_what"),
     );
     const campusCalendarUrl = `${url}&${defaultFilter}`;
-    console.log(campusCalendarUrl);
     setCampusCalendarUrl(campusCalendarUrl);
     return campusCalendarUrl;
   };
 
-  const notion = NotionService;
-
-  let databaseColumns: DatabaseColumns = {
+  const databaseColumns: DatabaseColumns = {
     title: {
       id: "",
       columnName: "",
@@ -102,26 +104,11 @@ export default function NewDatabase() {
   };
 
   useEffect(() => {
-    const getDatabases = async () => {
-      const databases = await notion.getDatabases();
-      setDatabases(databases);
-    };
-    getDatabases();
+    initializeDatabaseConfigProcces();
   }, []);
 
   useEffect(() => {
-    // TODO: Get database properties
-    if (!currentDatabase) {
-      return;
-    }
-    const getDatabaseProperties = async () => {
-      const properties = await notion.getDatabaseProperties(currentDatabase.id);
-      if (!properties) {
-        return;
-      }
-      setProperties(properties);
-    };
-    getDatabaseProperties();
+    setDatabaseProperties();
   }, [currentDatabase]);
 
   return (
@@ -142,22 +129,16 @@ export default function NewDatabase() {
             data={databases}
             renderItem={({ item }) => (
               <View
-                className={`flex items-center`}
+                className={"flex items-center"}
                 onTouchEnd={() => {
-                  if (currentDatabase?.id === item.id) {
-                    setCurrentDatabase(null);
-                    return;
-                  }
-                  setCurrentDatabase(item);
-                  console.log(item.id);
+                  selectDatabase(item);
                 }}
               >
                 <Text
-                  className={`w-[80%] py-3 my-1 rounded-xl text-center  ${
-                    currentDatabase?.id === item.id
+                  className={`w-[80%] py-3 my-1 rounded-xl text-center  ${currentDatabase?.id === item.id
                       ? "text-primary bg-gray"
                       : "text-white"
-                  }`}
+                    }`}
                 >{`${item.icon || ""} ${item.name}`}</Text>
               </View>
             )}
@@ -179,14 +160,13 @@ export default function NewDatabase() {
                 <View className="w-[60%] ">
                   <Dropdown
                     data={getPropertiesWithType(
-                      databaseColumns[key as keyof DatabaseColumns].type
+                      databaseColumns[key as keyof DatabaseColumns].type,
                     )}
                     onChange={(option) => {
                       databaseColumns[key as keyof DatabaseColumns].columnName =
                         option.label;
                       databaseColumns[key as keyof DatabaseColumns].id =
                         option.value;
-                      console.log(databaseColumns);
                     }}
                     placeholder=" "
                   />
@@ -204,7 +184,7 @@ export default function NewDatabase() {
                 className="text-primary cursor-pointer"
                 onPress={() => {
                   Linking.openURL(
-                    "https://informatica.cv.uma.es/calendar/export.php"
+                    "https://informatica.cv.uma.es/calendar/export.php",
                   );
                 }}
               >
@@ -247,7 +227,7 @@ export default function NewDatabase() {
         }}
         onPress={async () => {
           if (section === "database" && currentDatabase) {
-            setSection("properties");
+            changeSection("properties");
             return;
           }
 
@@ -255,37 +235,28 @@ export default function NewDatabase() {
             section === "properties" &&
             Object.values(databaseColumns).every((column) => column.id !== "")
           ) {
-            setAttributes(databaseColumns);
-            setSection((prev) =>
-              prev === "database" ? "properties" : "campus"
-            );
+            changeAttributes(databaseColumns);
+            changeSection();
           }
 
           if (section === "campus") {
             auth.setIsReady(false);
             await fetchCopiedText();
-            console.log("cambioo");
-            console.log(currentDatabase);
-            console.log("ATRI", attributes);
 
             // create user new data and redirect to home
             if (currentDatabase && attributes) {
-              console.log("USER", auth);
               currentDatabase.columns = attributes;
               currentDatabase.calendar_url = campusCalendarUrl;
               if (!auth.user) return;
               const payload = {
                 databases: [currentDatabase],
               };
-              console.log(payload);
               await storeUserData(auth.user.id, payload);
               await auth.updateUserContext();
               auth.setIsReady(true);
               router.replace("/");
             }
           }
-
-          console.log("aaaaa");
         }}
         elementColors={{
           containerColor: colors.gray,

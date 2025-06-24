@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { getTokenFromCode } from "@/features/auth/services/notionAuth";
 import { getSecureItem } from "@/application/services/SecureStorageService";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/useAuth";
 
 export default function Callback() {
   const route = useRoute();

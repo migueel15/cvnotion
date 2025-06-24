@@ -1,6 +1,6 @@
 import NotionService from "@/application/services/NotionService";
 import colors from "@/colors";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/useAuth";
 import type { NotionDatabase } from "@/types/types";
 import { Button } from "@expo/ui/jetpack-compose";
 import AsyncStorage from "@react-native-async-storage/async-storage";
